@@ -30,3 +30,14 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('sewa', 'SewaController@sewa');
 });
 
+
+$router->group(['middleware' => 'role:admin'], function () use ($router) {
+    $router->post('/komik', 'KomikController@store');
+    $router->put('/komik/{id}', 'KomikController@update');
+    $router->delete('/komik/{id}', 'KomikController@destroy');
+});
+
+$router->group(['middleware' => 'role:user'], function () use ($router) {
+    $router->post('/sewa', 'SewaController@store');
+});
+
