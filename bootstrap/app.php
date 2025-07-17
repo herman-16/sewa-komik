@@ -84,6 +84,10 @@ $app->routeMiddleware([
     'role' => App\Http\Middleware\RoleMiddleware::class
 ]);
 
+$app->routeMiddleware([
+    'auth.jwt' => App\Http\Middleware\JwtMiddleware::class,
+]);
+
 /*
 |--------------------------------------------------------------------------
 | Register Service Providers

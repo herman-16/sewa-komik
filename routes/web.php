@@ -18,26 +18,30 @@ $router->get('/', function () use ($router) {
 });
 
 $router->group(['prefix' => 'api'], function () use ($router) {
+    // Auth route (tanpa middleware)
     $router->post('register', 'AuthController@register');
     $router->post('login', 'AuthController@login');
 
+    // Komik list bisa diakses siapa saja
     $router->get('komik', 'KomikController@index');
-    $router->post('komik', 'KomikController@store');
-    $router->put('komik/{id}', 'KomikController@update');
-    $router->delete('komik/{id}', 'KomikController@destroy');
 
+    // Sewa list bisa diakses siapa saja
     $router->get('sewa', 'SewaController@index');
-    $router->post('sewa', 'SewaController@sewa');
+
+    // 👮 Hanya admin bisa CRUD komik
+    $router->group(['middleware' => 'role:admin'], function () use ($router) {
+        $router->post('komik', 'KomikController@store');
+        $router->put('komik/{id}', 'KomikController@update');
+        $router->delete('komik/{id}', 'KomikController@destroy');
+    });
+
+    // 👤 Hanya user biasa bisa sewa
+    $router->group(['middleware' => 'role:user'], function () use ($router) {
+        $router->post('sewa', 'SewaController@store');
+    });
+
+    $router->group(['middleware' => 'auth.jwt'], function () use ($router) {
+    $router->get('/user/profile', 'UserController@profile');
 });
-
-
-$router->group(['middleware' => 'role:admin'], function () use ($router) {
-    $router->post('/komik', 'KomikController@store');
-    $router->put('/komik/{id}', 'KomikController@update');
-    $router->delete('/komik/{id}', 'KomikController@destroy');
-});
-
-$router->group(['middleware' => 'role:user'], function () use ($router) {
-    $router->post('/sewa', 'SewaController@store');
 });
 
